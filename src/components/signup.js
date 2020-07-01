@@ -25,30 +25,53 @@ const useStyles = (theme) => ({
 
 
 class Login extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             auth: false,
-            process: false
+            process: false,
+            userInfo: {}
         }
     }
+
     componentDidMount() {
         let val;
         let cookiearr = document.cookie.split(/idblfs_email=/i, 2);
         val = cookiearr[1];
-        console.log('object', cookiearr)
         if (cookiearr.length > 1) {
-            this.setState({
-                auth: true,
-                name: val
+            axios({
+                url: "http://localhost:8080/fetch",
+                method: 'POST',
+                data: { email: val },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             })
+                .then(e => {
+                    this.setState({
+                        auth: true,
+                        userInfo: {
+                            name: e.data.name,
+                            email: e.data.email,
+                            lastLogin: e.data.updatedAt,
+                            loginCount: e.data.loginCount
+                        }
+                    });
+                    document.cookie = `idblfs_email=${this.state.userInfo.email}; expires=${60000}; path=/;`;
+                })
+                .catch(c => { console.log('not sned', c) })
+                .finally(() => {
+                    this.setState({
+                        process: true
+                    });
+                });
+
         }
     }
 
 
     onFormSubmit = (e) => {
         e.preventDefault();
-
 
         let data = {
             name: e.target.name.value,
@@ -70,9 +93,14 @@ class Login extends Component {
             .then(e => {
                 this.setState({
                     auth: true,
-                    name: e.data.email
+                    userInfo: {
+                        name: e.data.name,
+                        email: e.data.email,
+                        lastLogin: e.data.lastLogin,
+                        loginCount: e.data.loginCount
+                    }
                 });
-                document.cookie = `idblfs_email=${e.data.email}; expires=${60000}; path=/;`;
+                document.cookie = `idblfs_email=${this.state.userInfo.email}; expires=${60000}; path=/;`;
             })
             .catch(c => { console.log('not sned', c) })
             .finally(() => {
@@ -89,7 +117,7 @@ class Login extends Component {
             <Fragment>
 
                 {this.state.auth
-                    ? <Logout name={this.state.name} />
+                    ? <Logout userInfo={this.state.userInfo} />
                     : < Container component="main" maxWidth="xs" >
                         <CssBaseline />
                         <div className={classes.paper}>

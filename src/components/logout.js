@@ -15,8 +15,12 @@ const useStyles = (theme) => ({
 
 
 class Logout extends Component {
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
+        console.log(this.props)
+        this.state = {
+
+        }
     }
 
     handleClick = () => {
@@ -28,18 +32,25 @@ class Logout extends Component {
     }
 
     render() {
-        const { classes, name } = this.props;
-        console.log(this.props)
+        const { classes, userInfo } = this.props;
 
         return (
             <Container component="main" maxWidth="xs">
                 <CssBaseline />
                 <div className={classes.paper}>
-                    <Typography component="span" variant="h5">
-                        hey {name} thankyou,
-                    <Button variant={"outlined"} onClick={this.handleClick}>
-                            logout
-                    </Button>
+                    <Typography component="span" variant="h6">
+                        <Grid container>
+                            <Grid>NAME: {userInfo.name} </Grid>
+                            <Grid>email: {userInfo.email}</Grid>
+                            <Grid>last login: {userInfo.lastLogin}</Grid>
+                            <Grid>Login count (before yet): {userInfo.loginCount}</Grid>
+                        </Grid>
+                        <Grid>
+                            <Button variant={"outlined"} onClick={this.handleClick}>
+                                logout
+                            </Button>
+                        </Grid>
+
                     </Typography>
                 </div>
             </Container>
